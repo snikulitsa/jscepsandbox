@@ -22,23 +22,16 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertStoreException;
+import java.security.*;
+import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
 public class JscepSandbox {
 
-    private final static String SCEP_DOGTAG = "http://172.17.115.15:8080/ca/cgi-bin/pkiclient.exe";
+    private final static String SCEP_DOGTAG = "http://localhost:32775/ca/cgi-bin/pkiclient.exe";
 
     public static void main(String[] args) {
 
@@ -50,7 +43,10 @@ public class JscepSandbox {
                     url,
                     new DefaultCallbackHandler(new ConsoleCertificateVerifier())
             );
-//            logger.info("STRONGEST ALGORITHM = " + jscepClient.getCaCapabilities().getStrongestSignatureAlgorithm());
+            System.out.println(
+                    "STRONGEST ALGORITHM = "
+                            + jscepClient.getCaCapabilities().getStrongestSignatureAlgorithm()
+            );
 
 //            //SELF-SIGNED
 //            KeyPair registererKeyPair = generateKeys("RSA", 1024);
@@ -96,23 +92,25 @@ public class JscepSandbox {
             DERPrintableString password = new DERPrintableString("11111");
             csrBuilder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, password);
 
-            JcaContentSignerBuilder csrSignerBuilder = new JcaContentSignerBuilder("SHA512withRSA");
+            JcaContentSignerBuilder csrSignerBuilder = new JcaContentSignerBuilder("MD5withRSA");
             ContentSigner csrSigner = csrSignerBuilder.build(privateKey);
 
             PKCS10CertificationRequest csr = csrBuilder.build(csrSigner);
 
-            Collection<? extends Certificate> certificates
-                    = jscepClient.getCaCertificate().getCertificates(new X509CertSelector());
-            X509Certificate certificate = (X509Certificate) certificates.stream().findFirst().get();
+//            Collection<? extends Certificate> certificates
+//                    = jscepClient.getCaCertificate().getCertificates(new X509CertSelector());
+//            X509Certificate certificate = (X509Certificate) certificates.stream().findFirst().get();
 
-            EnrollmentResponse enrol = jscepClient.enrol(certificate, privateKey, csr);
+//            EnrollmentResponse enrol = jscepClient.enrol(certificate, privateKey, csr);
 
-//            //REQUEST
+            //REQUEST
 //            logger.info("================================================================");
-////            EnrollmentResponse response = jscepClient.enrol(requesterCert, privateKey, csr);
+            EnrollmentResponse response = jscepClient.enrol(requesterCert, privateKey, csr);
+
+            System.out.println(response.isSuccess());
 //            logger.info("----------------------------------------------------------------");
-////            CertStore certStore = response.getCertStore();
-//
+//            CertStore certStore = response.getCertStore();
+
 //            logger.info("FINISH");
 
 
@@ -122,10 +120,10 @@ public class JscepSandbox {
                 ClientException |
                 TransactionException |
                 CertIOException |
-                CertificateException |
-                CertStoreException e
+                CertificateException e//|
+//                CertStoreException e
         ) {
-//            logger.error(e.getMessage(), e);
+            e.printStackTrace();
         }
 
     }
@@ -150,7 +148,7 @@ public class JscepSandbox {
         );
         certBuilder.addExtension(X509Extension.keyUsage, false, new KeyUsage(KeyUsage.digitalSignature));
 
-        JcaContentSignerBuilder certSignerBuilder = new JcaContentSignerBuilder("SHA512withRSA");
+        JcaContentSignerBuilder certSignerBuilder = new JcaContentSignerBuilder("MD5withRSA");
         ContentSigner certSigner = certSignerBuilder.build(registererKeyPair.getPrivate());
         X509CertificateHolder certHolder = certBuilder.build(certSigner);
 
