@@ -127,8 +127,8 @@ public class JscepSandbox {
                         requesterSubject,
                         requesterKeyPair.getPublic()
                 );
-        PrivateKey requesterPrivKey = requesterKeyPair.getPrivate(); // from generated key pair
-        JcaContentSignerBuilder certSignerBuilder = new JcaContentSignerBuilder(algorithm); // from above
+        PrivateKey requesterPrivKey = requesterKeyPair.getPrivate();
+        JcaContentSignerBuilder certSignerBuilder = new JcaContentSignerBuilder(algorithm);
         ContentSigner certSigner = certSignerBuilder.build(requesterPrivKey);
         X509CertificateHolder certHolder = certBuilder.build(certSigner);
         JcaX509CertificateConverter converter = new JcaX509CertificateConverter();
