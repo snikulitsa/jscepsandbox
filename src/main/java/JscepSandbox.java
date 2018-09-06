@@ -33,6 +33,7 @@ import java.util.Date;
 /**
  * Good guide for DogTag installation on CentOS: https://magnus-k-karlsson.blogspot.com/2017/11/installing-and-testing-dogtag.html
  * SCEP enable: http://www.dogtagpki.org/wiki/SCEP_Setup
+ * Original JSCEP guide: https://github.com/jscep/jscep
  */
 public class JscepSandbox {
 
